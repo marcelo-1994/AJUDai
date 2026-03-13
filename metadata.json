@@ -1,0 +1,8 @@
+{
+  "name": "+AJUDAÍ+",
+  "description": "O ecossistema definitivo de ajuda mútua e colaboração. AJUDAÍ+ é um HUB modular que conecta pessoas, profissionais e ferramentas experimentais em um único ecossistema escalável.",
+  "requestFramePermissions": [
+    "microphone",
+    "geolocation"
+  ]
+}

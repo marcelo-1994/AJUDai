@@ -1,0 +1,58 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-and-lint:
+    name: 🛡️ Security & Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Type Check (TypeScript)
+        run: npm run lint
+      # Em um ambiente real, rodaríamos um npm audit aqui
+      - name: Security Audit
+        run: npm audit --audit-level=high || true
+
+  test:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: security-and-lint
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Run Tests
+        run: npm run test
+
+  build:
+    name: 🏗️ Production Build
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build Application
+        run: npm run build
