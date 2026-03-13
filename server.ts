@@ -104,7 +104,7 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-app.use('/api/', limiter);
+app.use('/api', limiter);
 
 // Log de todas as requisições para depuração
 app.use((req, res, next) => {
@@ -759,8 +759,9 @@ app.get("/api/admin/users", authenticateToken, async (req: any, res: any) => {
   }
 });
 
+app.options("/api/create-mercadopago-preference", cors());
 app.post("/api/create-mercadopago-preference", authenticateToken, async (req, res) => {
-  console.log("[API] POST /api/create-mercadopago-preference called");
+  console.log(`[API] ${req.method} /api/create-mercadopago-preference called`);
   console.log("[API] Criando preferência MP. Body:", JSON.stringify(req.body));
   console.log("[API] Memória:", process.memoryUsage());
   const { planId, userId, productId } = req.body;
