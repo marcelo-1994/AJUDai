@@ -202,7 +202,7 @@ export const Profile = () => {
         onSuccess={handleFaceIDSuccess}
         mode="register"
         userEmail={user.email}
-        userToken={localStorage.getItem('supabase.auth.token') || ''} // Fallback if needed
+        userToken={profile.id} // Using profile ID as a stable token for the mock
       />
       <div className="glass-panel p-8 rounded-3xl mb-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-indigo-900/50 to-purple-900/50"></div>

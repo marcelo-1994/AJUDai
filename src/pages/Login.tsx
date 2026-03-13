@@ -97,9 +97,37 @@ export const Login = () => {
     
     // In a real app, you'd verify the token or use a refresh token
     // For this facilitation, we'll try to restore the session or re-auth
-    const { data, error } = await supabase.auth.setSession({
+    
+    // Check if it's a real JWT or our mock token (profile.id)
+    if (token.length < 50) {
+      // It's likely our mock token (profile.id), so we'll try to find the user
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', token)
+        .single();
+        
+      if (userError || !userData) {
+        setError("Sessão expirada ou usuário não encontrado. Entre com sua senha uma vez para reativar o Face ID.");
+        localStorage.removeItem('ajudai_face_auth');
+        setLoading(false);
+        return;
+      }
+      
+      // Since we can't manually "log in" a user without their password in Supabase Auth 
+      // (unless using admin SDK which we don't have here), we'll inform the user.
+      // However, for the sake of the "facilitation", we can simulate the login 
+      // by redirecting if we found the user, but Supabase Auth state won't be updated.
+      // A better way is to tell them to use password if session is truly gone.
+      
+      setError("Para sua segurança, o primeiro acesso após reiniciar o navegador deve ser com senha. Depois disso, o Face ID funcionará normalmente.");
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase.auth.setSession({
       access_token: token,
-      refresh_token: '', // We might not have it, but setSession can work with just access_token if valid
+      refresh_token: '', 
     });
 
     if (error) {

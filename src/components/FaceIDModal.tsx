@@ -52,9 +52,29 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({
       });
       
       setStream(mediaStream);
+      
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        
+        // Ensure the video plays
+        const playVideo = async () => {
+          try {
+            await videoRef.current?.play();
+            console.log("Câmera iniciada com sucesso");
+          } catch (e) {
+            console.error("Erro ao dar play no vídeo:", e);
+            // Fallback: try again on click or after a short delay
+            setTimeout(() => videoRef.current?.play().catch(() => {}), 500);
+          }
+        };
+        
+        videoRef.current.onloadedmetadata = playVideo;
+        // Also try playing immediately in case onloadedmetadata already fired
+        playVideo();
       }
+
+      // Wait a bit for the camera to stabilize before "reading"
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Simulate facial recognition logic
       setTimeout(() => {
@@ -68,10 +88,10 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({
             setStatus('success');
             setTimeout(() => {
               onSuccess(userEmail, userToken);
-            }, 1500);
+            }, 1000);
           } else {
             setStatus('error');
-            setErrorMessage('Erro ao vincular conta. Tente novamente.');
+            setErrorMessage('Dados de usuário incompletos para o cadastro.');
           }
           return;
         }
@@ -83,16 +103,16 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({
             setStatus('success');
             setTimeout(() => {
               onSuccess(email, token);
-            }, 1500);
+            }, 1000);
           } catch (e) {
             setStatus('error');
             setErrorMessage('Dados de reconhecimento facial corrompidos.');
           }
         } else {
           setStatus('error');
-          setErrorMessage('Nenhum rosto cadastrado. Entre com sua senha primeiro e ative o Face ID nas opções.');
+          setErrorMessage('Nenhum rosto cadastrado. Entre com sua senha primeiro e ative o Face ID nas opções do seu Perfil.');
         }
-      }, 3000);
+      }, 2000); // Reduced from 3000 to 2000 for better UX
 
     } catch (err: any) {
       console.error("Erro ao acessar câmera:", err);
