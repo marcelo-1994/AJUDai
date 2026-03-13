@@ -189,6 +189,7 @@ const PLANS = {
 
 // Middleware de Autenticação
 const authenticateToken = async (req: any, res: any, next: any) => {
+  console.log("[Auth] Token check...");
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -759,6 +760,7 @@ app.get("/api/admin/users", authenticateToken, async (req: any, res: any) => {
 });
 
 app.post("/api/create-mercadopago-preference", authenticateToken, async (req, res) => {
+  console.log("[API] POST /api/create-mercadopago-preference called");
   console.log("[API] Criando preferência MP. Body:", JSON.stringify(req.body));
   console.log("[API] Memória:", process.memoryUsage());
   const { planId, userId, productId } = req.body;
