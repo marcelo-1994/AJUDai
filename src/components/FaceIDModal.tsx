@@ -7,9 +7,19 @@ interface FaceIDModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (email: string, token: string) => void;
+  mode?: 'login' | 'register';
+  userEmail?: string;
+  userToken?: string;
 }
 
-export const FaceIDModal: React.FC<FaceIDModalProps> = ({ isOpen, onClose, onSuccess }) => {
+export const FaceIDModal: React.FC<FaceIDModalProps> = ({ 
+  isOpen, 
+  onClose, 
+  onSuccess, 
+  mode = 'login',
+  userEmail,
+  userToken
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<'idle' | 'scanning' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -27,17 +37,45 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({ isOpen, onClose, onSuc
   const startCamera = async () => {
     try {
       setStatus('scanning');
+      setErrorMessage('');
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Navegador não suporta acesso à câmera ou está em modo privado.');
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'user' } 
+        video: { 
+          facingMode: 'user',
+          width: { ideal: 640 },
+          height: { ideal: 640 }
+        } 
       });
+      
       setStream(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
 
       // Simulate facial recognition logic
-      // In a real app, you'd use face-api.js or a backend call here
       setTimeout(() => {
+        if (mode === 'register') {
+          if (userEmail && userToken) {
+            localStorage.setItem('ajudai_face_auth', JSON.stringify({
+              email: userEmail,
+              token: userToken,
+              timestamp: Date.now()
+            }));
+            setStatus('success');
+            setTimeout(() => {
+              onSuccess(userEmail, userToken);
+            }, 1500);
+          } else {
+            setStatus('error');
+            setErrorMessage('Erro ao vincular conta. Tente novamente.');
+          }
+          return;
+        }
+
         const savedFaceData = localStorage.getItem('ajudai_face_auth');
         if (savedFaceData) {
           try {
@@ -52,14 +90,21 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({ isOpen, onClose, onSuc
           }
         } else {
           setStatus('error');
-          setErrorMessage('Nenhum rosto cadastrado neste dispositivo. Faça login com senha primeiro e ative o Face ID.');
+          setErrorMessage('Nenhum rosto cadastrado. Entre com sua senha primeiro e ative o Face ID nas opções.');
         }
       }, 3000);
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Erro ao acessar câmera:", err);
       setStatus('error');
-      setErrorMessage('Não foi possível acessar a câmera. Verifique as permissões.');
+      
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setErrorMessage('Acesso negado. Clique no ícone de cadeado na barra de endereços do navegador e permita o uso da Câmera.');
+      } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+        setErrorMessage('Nenhuma câmera frontal encontrada neste dispositivo.');
+      } else {
+        setErrorMessage('Erro ao acessar câmera. Verifique se outra aba não está usando a câmera ou se o site tem permissão.');
+      }
     }
   };
 
@@ -91,10 +136,12 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({ isOpen, onClose, onSuc
           <div className="inline-flex items-center justify-center p-3 bg-indigo-500/10 rounded-2xl mb-4">
             <ScanFace className="h-8 w-8 text-indigo-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white">Face ID AJUDAÍ</h2>
+          <h2 className="text-2xl font-bold text-white">
+            {mode === 'register' ? 'Cadastrar Face ID' : 'Face ID AJUDAÍ'}
+          </h2>
           <p className="text-zinc-400 text-sm mt-2">
-            {status === 'scanning' && 'Escaneando seu rosto...'}
-            {status === 'success' && 'Identidade confirmada!'}
+            {status === 'scanning' && (mode === 'register' ? 'Mapeando seu rosto...' : 'Escaneando seu rosto...')}
+            {status === 'success' && (mode === 'register' ? 'Rosto cadastrado!' : 'Identidade confirmada!')}
             {status === 'error' && 'Falha no reconhecimento'}
           </p>
         </div>

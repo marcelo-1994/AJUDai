@@ -2,13 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/Button';
-import { Star, Award, Medal, CheckCircle2, Clock, MessageSquare, Trophy, Edit2, Save, X, Upload, Loader2, ShieldCheck, Activity } from 'lucide-react';
+import { Star, Award, Medal, CheckCircle2, Clock, MessageSquare, Trophy, Edit2, Save, X, Upload, Loader2, ShieldCheck, Activity, ScanFace } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { FaceIDModal } from '../components/FaceIDModal';
 
 export const Profile = () => {
   const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [showFaceModal, setShowFaceModal] = useState(false);
+  const [faceIdEnabled, setFaceIdEnabled] = useState(!!localStorage.getItem('ajudai_face_auth'));
   const [editName, setEditName] = useState('');
   const [editBio, setEditBio] = useState('');
   const [editPhone, setEditPhone] = useState('');
@@ -178,8 +181,29 @@ export const Profile = () => {
   const hasComunicador = stats.responsesCount >= 10;
   const hasTop10 = (profile.reputation_score || 0) >= 100;
 
+  const handleFaceIDSuccess = () => {
+    setShowFaceModal(false);
+    setFaceIdEnabled(true);
+    alert('Face ID configurado com sucesso! Agora você pode entrar na sua conta usando reconhecimento facial.');
+  };
+
+  const handleRemoveFaceID = () => {
+    if (confirm('Tem certeza que deseja remover o acesso por Face ID deste dispositivo?')) {
+      localStorage.removeItem('ajudai_face_auth');
+      setFaceIdEnabled(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto">
+      <FaceIDModal 
+        isOpen={showFaceModal} 
+        onClose={() => setShowFaceModal(false)} 
+        onSuccess={handleFaceIDSuccess}
+        mode="register"
+        userEmail={user.email}
+        userToken={localStorage.getItem('supabase.auth.token') || ''} // Fallback if needed
+      />
       <div className="glass-panel p-8 rounded-3xl mb-8 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-indigo-900/50 to-purple-900/50"></div>
         
@@ -505,12 +529,32 @@ export const Profile = () => {
                 </div>
               )}
               
-              <div className="flex justify-between items-center opacity-50 mt-4">
+              <div className="flex justify-between items-center mt-4">
                 <div>
-                  <span className="text-white text-sm font-medium block">Verificação Facial</span>
-                  <span className="text-zinc-400 text-xs">Disponível em breve para planos PRO</span>
+                  <span className="text-white text-sm font-medium block">Verificação Facial (Face ID)</span>
+                  <span className="text-zinc-400 text-xs">
+                    {faceIdEnabled ? 'Ativado neste dispositivo' : 'Entre sem senha usando seu rosto'}
+                  </span>
                 </div>
-                <div className="bg-zinc-800 px-2 py-1 rounded text-[10px] font-bold text-zinc-500 uppercase">Breve</div>
+                {faceIdEnabled ? (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleRemoveFaceID}
+                    className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                  >
+                    Remover
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowFaceModal(true)}
+                    className="border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10"
+                  >
+                    Configurar
+                  </Button>
+                )}
               </div>
             </div>
           </div>
