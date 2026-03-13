@@ -119,7 +119,7 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({
       setStatus('error');
       
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        setErrorMessage('Acesso negado. Clique no ícone de cadeado na barra de endereços do navegador e permita o uso da Câmera.');
+        setErrorMessage('Acesso negado. Clique no ícone de cadeado na barra de endereços e permita a Câmera. Se o erro persistir, tente abrir o app em uma nova aba.');
       } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
         setErrorMessage('Nenhuma câmera frontal encontrada neste dispositivo.');
       } else {
