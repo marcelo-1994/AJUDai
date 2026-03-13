@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Button } from '../components/ui/Button';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, ScanFace } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { FaceIDModal } from '../components/FaceIDModal';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberFace, setRememberFace] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showFaceModal, setShowFaceModal] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -45,6 +48,18 @@ export const Login = () => {
         setError(error.message);
       }
     } else {
+      // If rememberFace is checked, save for Face ID
+      if (rememberFace) {
+        const session = await supabase.auth.getSession();
+        if (session.data.session) {
+          localStorage.setItem('ajudai_face_auth', JSON.stringify({
+            email,
+            token: session.data.session.access_token,
+            timestamp: Date.now()
+          }));
+        }
+      }
+
       // Trigger n8n Webhook
       fetch('/api/public/trigger-webhook', {
         method: 'POST',
@@ -76,8 +91,33 @@ export const Login = () => {
     }
   };
 
+  const handleFaceIDSuccess = async (email: string, token: string) => {
+    setShowFaceModal(false);
+    setLoading(true);
+    
+    // In a real app, you'd verify the token or use a refresh token
+    // For this facilitation, we'll try to restore the session or re-auth
+    const { data, error } = await supabase.auth.setSession({
+      access_token: token,
+      refresh_token: '', // We might not have it, but setSession can work with just access_token if valid
+    });
+
+    if (error) {
+      setError("Sessão expirada. Por favor, entre com sua senha uma vez para reativar o Face ID.");
+      localStorage.removeItem('ajudai_face_auth');
+    } else {
+      navigate('/dashboard');
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="max-w-md mx-auto mt-20 p-8 bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+      <FaceIDModal 
+        isOpen={showFaceModal} 
+        onClose={() => setShowFaceModal(false)} 
+        onSuccess={handleFaceIDSuccess} 
+      />
       <h2 className="text-3xl font-bold text-center mb-8">Bem-vindo de volta</h2>
       
       {error && <div className="bg-red-50 text-red-600 p-3 rounded-md mb-6 text-sm">{error}</div>}
@@ -117,9 +157,34 @@ export const Login = () => {
             </button>
           </div>
         </div>
-        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading}>
-          {loading ? 'Entrando...' : 'Entrar'}
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <input 
+            type="checkbox" 
+            id="rememberFace" 
+            checked={rememberFace}
+            onChange={(e) => setRememberFace(e.target.checked)}
+            className="rounded border-zinc-300 dark:border-zinc-700 text-indigo-600 focus:ring-indigo-500"
+          />
+          <label htmlFor="rememberFace" className="text-sm text-zinc-600 dark:text-zinc-400 cursor-pointer">
+            Ativar Reconhecimento Facial (Face ID)
+          </label>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </Button>
+          
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => setShowFaceModal(true)}
+            className="w-full border-indigo-500/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/5"
+          >
+            <ScanFace className="h-4 w-4 mr-2" /> Entrar com Face ID
+          </Button>
+        </div>
       </form>
 
       <div className="mt-6 flex items-center justify-between">
