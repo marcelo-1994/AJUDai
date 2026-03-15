@@ -6,7 +6,8 @@ import { Button } from '../components/ui/Button';
 import { 
   PlusCircle, Clock, CheckCircle2, Star, AlertCircle, Zap, Rocket, 
   Briefcase, GraduationCap, PlayCircle, Users, Store, Trophy, Share2, Coffee,
-  Play, Info, BookOpen, Search, HelpCircle, Gift, Compass, LineChart, ChevronRight
+  Play, Info, BookOpen, Search, HelpCircle, Gift, Compass, LineChart, ChevronRight,
+  Tag
 } from 'lucide-react';
 import PedidosList from '../components/PedidosList';
 import { Tutorial } from '../components/Tutorial';
@@ -104,6 +105,15 @@ export const Dashboard = () => {
       to: '/community',
       bgGradient: 'bg-gradient-to-br from-purple-600 to-fuchsia-800',
       image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600'
+    },
+    {
+      title: 'Anúncios',
+      description: 'Publique ofertas ou pedidos de ajuda na comunidade.',
+      icon: <Tag className="h-6 w-6 text-white" />,
+      to: '/ads',
+      bgGradient: 'bg-gradient-to-br from-orange-500 to-red-700',
+      badge: 'HOT',
+      image: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=600'
     },
     {
       title: 'Explorar HUB',

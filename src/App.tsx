@@ -43,6 +43,7 @@ const UserProfile = lazy(() => import('./pages/UserProfile').then(m => ({ defaul
 const Workspace = lazy(() => import('./pages/Workspace'));
 const AIAssistant = lazy(() => import('./pages/AIAssistant'));
 const PersonalTools = lazy(() => import('./pages/PersonalTools').then(m => ({ default: m.PersonalTools })));
+const Ads = lazy(() => import('./pages/Ads').then(m => ({ default: m.Ads })));
 
 import { IdleOverlay } from './components/IdleOverlay';
 import { TwoFactorGuard } from './components/TwoFactorGuard';
@@ -203,6 +204,7 @@ export default function App() {
                       <PersonalTools />
                     </ProtectedRoute>
                   } />
+                  <Route path="ads" element={<Ads />} />
                 </Route>
               </Routes>
             </Suspense>

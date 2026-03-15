@@ -6,7 +6,7 @@ import {
   HeartHandshake, Menu, UserCircle, X, Sun, Moon, Rocket, Gamepad2, 
   GraduationCap, PlayCircle, Briefcase, ShoppingBag, Users, MessageSquare, 
   Trophy, BookOpen, Share2, LayoutDashboard, Settings, Search, ShieldCheck,
-  LogOut, Clock
+  LogOut, Clock, Tag
 } from 'lucide-react';
 import { Notifications } from './Notifications';
 import { GlobalSearch } from './GlobalSearch';
@@ -77,6 +77,7 @@ export const Layout = () => {
               <Rocket className="h-4 w-4" /> Explorar
             </Link>
             <Link to="/pedidos" className="text-zinc-300 hover:text-white transition-colors font-bold">Serviços</Link>
+            <Link to="/ads" className="text-zinc-300 hover:text-white transition-colors font-bold">Anúncios</Link>
             <Link to="/entertainment" className="text-rose-400 hover:text-rose-300 transition-colors flex items-center gap-1 font-bold">
               <PlayCircle className="h-4 w-4" /> Entretenimento
             </Link>
@@ -180,6 +181,7 @@ export const Layout = () => {
 
             <MobileSection title="Negócios & Mercado">
               <MobileNavLink to="/pedidos" icon={Briefcase}>Serviços AJUDAÍ</MobileNavLink>
+              <MobileNavLink to="/ads" icon={Tag}>Anúncios & Ofertas</MobileNavLink>
               <MobileNavLink to="/marketplace" icon={ShoppingBag}>Marketplace</MobileNavLink>
               <MobileNavLink to="/professionals" icon={Users}>Profissionais</MobileNavLink>
             </MobileSection>
