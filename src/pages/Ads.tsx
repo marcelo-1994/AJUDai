@@ -93,12 +93,21 @@ export const Ads = () => {
     try {
       let adId: string | null = null;
 
+      // Prepare data for Supabase - we don't set is_premium to true here
+      // if it's a new premium request. It will be set by the webhook after payment.
+      const adData = {
+        title: newAd.title,
+        description: newAd.description,
+        category: newAd.category,
+        type: newAd.type,
+        location: newAd.location,
+        is_premium: editingAd ? editingAd.is_premium : false
+      };
+
       if (editingAd) {
         const { data, error } = await supabase
           .from('ads')
-          .update({
-            ...newAd,
-          })
+          .update(adData)
           .eq('id', editingAd.id)
           .select()
           .single();
@@ -109,7 +118,7 @@ export const Ads = () => {
         const { data, error } = await supabase
           .from('ads')
           .insert([{
-            ...newAd,
+            ...adData,
             user_id: user.id
           }])
           .select()
@@ -119,7 +128,7 @@ export const Ads = () => {
         adId = data.id;
       }
 
-      // If it's premium and not already premium, trigger payment
+      // If the user wants premium and it's not already premium, trigger payment redirect
       if (newAd.is_premium && (!editingAd || !editingAd.is_premium)) {
         const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`/api/ads/${adId}/create-payment`, {
@@ -130,10 +139,16 @@ export const Ads = () => {
           }
         });
 
-        if (!response.ok) throw new Error('Erro ao criar pagamento');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao criar pagamento');
+        }
+        
         const { init_point } = await response.json();
-        window.location.href = init_point;
-        return; // Redirecting, no need to continue
+        if (init_point) {
+          window.location.href = init_point;
+          return; // Redirecting, no need to continue
+        }
       }
       
       setShowCreateModal(false);
