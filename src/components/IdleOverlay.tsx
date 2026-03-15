@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Coffee, X, ChevronRight, Trophy, Maximize2, Minimize2 } from 'lucide-react';
 import { MemoryGame } from './games/MemoryGame';
 import { TicTacToe } from './games/TicTacToe';

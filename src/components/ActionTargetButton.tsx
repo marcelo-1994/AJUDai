@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Target, ArrowRight, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export const ActionTargetButton = () => {

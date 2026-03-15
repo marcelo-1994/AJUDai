@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { BookOpen, MessageSquare, Heart, Share2, Search, TrendingUp, Cpu, Users, Zap, ChevronRight, MessageCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';

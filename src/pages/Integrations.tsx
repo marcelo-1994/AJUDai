@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link2, Webhook, Github, MessageCircle, CheckCircle, ExternalLink, RefreshCw, Loader2, CreditCard, Linkedin, Twitter, Instagram, Facebook, Youtube, Twitch, Globe, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
