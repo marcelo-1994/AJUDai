@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, HelpCircle, ShoppingBag, Gift, MessageCircle, X, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function QuickAccess() {
   const [isOpen, setIsOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { Layers, Database, Shield, CreditCard, TrendingUp, Map, Code, Server, Globe, Cpu } from 'lucide-react';
 
 export const ArchitectureDocs = () => {

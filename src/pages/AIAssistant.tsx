@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MessageSquare, ShieldCheck, Settings, Send, CheckCircle2, AlertCircle, ExternalLink, Copy } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 
 export default function AIAssistant() {
   const [testNumber, setTestNumber] = useState('');

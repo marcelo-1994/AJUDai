@@ -45,7 +45,6 @@ app.set('trust proxy', 1);
 const PORT = 3000;
 
 // Security middleware
-/*
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
@@ -53,7 +52,6 @@ app.use(helmet({
     action: 'deny', // Default to deny, but we'll override for the preview
   },
 }));
-*/
 
 // Allow framing for the AI Studio preview
 app.use((req, res, next) => {

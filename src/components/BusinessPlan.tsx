@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, X, TrendingUp, Users, DollarSign, Heart, Target, ShieldCheck, Zap, Rocket } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { Button } from './ui/Button';
 
 export const BusinessPlan = () => {

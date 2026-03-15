@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Lock, Unlock, Star, Award, CheckCircle2, TrendingUp, ShoppingCart, X, Video, DollarSign, ShieldCheck, Heart, MessageCircle, Share2, MoreVertical, Upload } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../lib/supabase';
 
 export const AjudaiPlay = () => {
