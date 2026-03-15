@@ -185,6 +185,7 @@ const PLANS = {
   'credits_15': { name: 'Pacote Intermediário (+15 Créditos)', price: 29 },
   'credits_60': { name: 'Pacote Avançado (+60 Créditos)', price: 99 },
   'highlight_7d': { name: 'Destaque de Produto (7 dias)', price: 10 },
+  'ad_premium': { name: 'Anúncio Premium (Destaque)', price: 15 },
 };
 
 // Middleware de Autenticação
@@ -443,6 +444,59 @@ app.post("/api/pedidos/:id/confirm", authenticateToken, async (req: any, res: an
 
     if (error) throw error;
     res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/api/ads/:id/create-payment", authenticateToken, async (req: any, res: any) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.sub;
+
+    if (!mpClient) {
+      return res.status(500).json({ error: "Mercado Pago não configurado." });
+    }
+
+    const { data: ad, error: aError } = await supabaseAdmin
+      .from('ads')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (aError || !ad) throw new Error("Anúncio não encontrado.");
+
+    const preference = new Preference(mpClient);
+    const appUrl = (process.env.APP_URL || "").replace(/\/$/, "");
+    
+    const response = await preference.create({
+      body: {
+        items: [
+          {
+            id: `ad_premium`,
+            title: `Anúncio Premium: ${ad.title}`,
+            quantity: 1,
+            unit_price: 15,
+            currency_id: "BRL",
+          }
+        ],
+        external_reference: userId,
+        notification_url: `${appUrl}/api/webhooks/mercadopago`,
+        metadata: {
+          user_id: userId,
+          ad_id: ad.id,
+          type: 'ad_premium_payment'
+        },
+        back_urls: {
+          success: `${appUrl}/ads?status=success`,
+          failure: `${appUrl}/ads?status=failure`,
+          pending: `${appUrl}/ads?status=pending`
+        },
+        auto_return: "approved",
+      }
+    });
+
+    res.json({ init_point: response.init_point });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -1210,6 +1264,19 @@ app.post("/api/webhooks/mercadopago", async (req, res) => {
                   user_id: pedido.cliente_id,
                   title: 'Pagamento Realizado',
                   content: `Seu pagamento para o pedido #${pedidoId.slice(0, 8)} foi processado com sucesso.`,
+                  type: 'system'
+                });
+              }
+            } else if (paymentInfo.metadata?.type === 'ad_premium_payment') {
+              const adId = paymentInfo.metadata?.ad_id;
+              if (adId) {
+                await supabaseAdmin.from('ads').update({ is_premium: true }).eq('id', adId);
+                
+                // Notify user
+                await supabaseAdmin.from('notifications').insert({
+                  user_id: userId,
+                  title: 'Anúncio Premium Ativado!',
+                  content: `Seu anúncio foi destacado com sucesso. Ele agora aparecerá no topo das buscas.`,
                   type: 'system'
                 });
               }
