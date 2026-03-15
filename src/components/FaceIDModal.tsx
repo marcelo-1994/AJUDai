@@ -220,27 +220,42 @@ export const FaceIDModal: React.FC<FaceIDModalProps> = ({
         </div>
 
         {status === 'error' && (
-          <div className="text-center">
-            <p className="text-red-400 text-sm mb-4">{errorMessage}</p>
+          <div className="flex flex-col gap-3">
+            <p className="text-red-400 text-sm mb-4 text-center">{errorMessage}</p>
             <Button 
               onClick={startCamera}
-              className="w-full bg-zinc-800 hover:bg-zinc-700 text-white"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
             >
               Tentar Novamente
+            </Button>
+            <Button 
+              onClick={onClose}
+              variant="outline"
+              className="w-full border-white/10 text-white hover:bg-white/5"
+            >
+              Entrar com Senha
             </Button>
           </div>
         )}
 
         {status === 'scanning' && (
-          <div className="flex justify-center gap-1">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                animate={{ opacity: [0.3, 1, 0.3] }}
-                transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
-                className="w-2 h-2 bg-indigo-500 rounded-full"
-              />
-            ))}
+          <div className="space-y-6">
+            <div className="flex justify-center gap-1">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                  className="w-2 h-2 bg-indigo-500 rounded-full"
+                />
+              ))}
+            </div>
+            <button 
+              onClick={onClose}
+              className="w-full text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+            >
+              Pular e usar senha
+            </button>
           </div>
         )}
       </motion.div>
