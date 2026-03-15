@@ -45,6 +45,7 @@ app.set('trust proxy', 1);
 const PORT = 3000;
 
 // Security middleware
+/*
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
   contentSecurityPolicy: process.env.NODE_ENV === "production" ? undefined : false,
@@ -52,6 +53,7 @@ app.use(helmet({
     action: 'deny', // Default to deny, but we'll override for the preview
   },
 }));
+*/
 
 // Allow framing for the AI Studio preview
 app.use((req, res, next) => {
@@ -1671,10 +1673,12 @@ async function startServer() {
     app.use("*", async (req, res, next) => {
       try {
         const url = req.originalUrl;
+        console.log(`[Vite] Serving ${url}`);
         const template = await fs.readFile(path.resolve(__dirname, "index.html"), "utf-8");
         const html = await vite.transformIndexHtml(url, template);
         res.status(200).set({ "Content-Type": "text/html" }).end(html);
       } catch (e) {
+        console.error("[Vite] Error serving index.html:", e);
         next(e);
       }
     });
