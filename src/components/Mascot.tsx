@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Sparkles, HeartHandshake, Bot, Zap, Trash2, Volume2, VolumeX, Pin, ExternalLink, Mic, MicOff, Loader2 } from 'lucide-react';
 import { GoogleGenAI, Modality } from "@google/genai";
 
