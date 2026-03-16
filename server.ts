@@ -514,6 +514,10 @@ app.get("/api/health", (req, res) => {
   });
 });
 
+app.get("/test", (req, res) => {
+  res.send("Server is alive");
+});
+
 // --- VIDEOS ---
 app.get("/api/videos", async (req, res) => {
   try {
@@ -1663,6 +1667,7 @@ async function startServer() {
     });
   });
 
+  process.env.NODE_ENV = "development";
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
@@ -1675,6 +1680,7 @@ async function startServer() {
         const url = req.originalUrl;
         console.log(`[Vite] Serving ${url}`);
         const template = await fs.readFile(path.resolve(__dirname, "index.html"), "utf-8");
+        console.log(`[Vite] Read index.html, length: ${template.length}`);
         const html = await vite.transformIndexHtml(url, template);
         res.status(200).set({ "Content-Type": "text/html" }).end(html);
       } catch (e) {

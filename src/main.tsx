@@ -4,6 +4,10 @@ import App from './App';
 import './index.css';
 
 console.log('Main script executing...');
-createRoot(document.getElementById('root')!).render(
-  <App />
+const root = document.getElementById('root');
+console.log('Root element:', root);
+createRoot(root!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
 );
